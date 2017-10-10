@@ -16,7 +16,7 @@ exports.executequery = function(query, callback){
 	connection.connect();
 	console.log("SQL Query:: " + query);
 	connection.query(query, function (err, rows, fields) {
-	  	if (err) throw err
+	  	if (err) callback(err, null);
 	  	else callback(null, rows);
 	});
 
