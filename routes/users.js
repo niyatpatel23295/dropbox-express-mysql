@@ -48,25 +48,27 @@ router.post('/signIn', function(req, res, next) {
   			console.trace(err);
   			res.status(500).json({"error": "Internal server error"});
   		}
-  		else if( !(data.length > 0) ){
-  			res.status(200).json({"error": "User not found"});
-  		}
-  		else{
-  			var password_hash = data[0].password;
-  			var salt = data[0].salt;
+  		else {
+  			if( !(data.length > 0) ){
+  				res.status(404).json({"error": "User not found"});
+  			}	
+	  		else{
+	  			var password_hash = data[0].password;
+	  			var salt = data[0].salt;
 
-  			// compute password hash of given password
-  			var _hash = crypto.createHmac('sha512', salt);
-  			_hash.update(req.body.password);
-  			var _password_hash = _hash.digest('hex');
+	  			// compute password hash of given password
+	  			var _hash = crypto.createHmac('sha512', salt);
+	  			_hash.update(req.body.password);
+	  			var _password_hash = _hash.digest('hex');
 
-  			// Check input password with stored password
-  			if(_password_hash !== password_hash){
-  				res.status(401).json({"error": "Incorrect Password"});
-  			}
-  			else{
-  				res.status(200).json({"message": "success"});
-  			}
+	  			// Check input password with stored password
+	  			if(_password_hash !== password_hash){
+	  				res.status(401).json({"error": "Incorrect Password"});
+	  			}
+	  			else{
+	  				res.status(200).json({"message": "success"});
+	  			}
+	  		}
   		}
   	});
 });
