@@ -29,42 +29,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', index);
 app.use('/users', users);
 
-app.use('/file', files);
+app.use('/files', files);
 
-// TODO file
-// /file/upload
-// /file/getFileslist
-// /file/
 
-/*app.post('/files/:uaid/*', function (req, res, next) {
-	console.log('Request received');
 
-	if(req.params.uaid == 1){
-		//send
-	  var options = {
-	    root: __dirname ,
-	    dotfiles: 'deny',
-	    headers: {
-	        'x-timestamp': Date.now(),
-	        'x-sent': true
-	    }
-	  }
-
-	  var fileName = req.originalUrl;
-	  res.sendFile(fileName, options, function (err) {
-	    if (err) {
-	      next(err);
-	    } else {
-	      console.log('Sent:', fileName);
-	    }
-	  });
-	}
-	else{
-		//dont
-		res.send("Access Denied!");
-	}
-	});
-*/
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   var err = new Error('Not Found');

@@ -13,7 +13,7 @@ module.exports = function(){
 			}
 			else{
 				if(req.cookies && req.cookies.email && req.cookies.password){
-					var getUserDataSQL = "SELECT email, password, salt FROM dropbox.useraccount where email like '" +req.cookies.email + "';";
+					var getUserDataSQL = "SELECT uaid, email, password, salt FROM dropbox.useraccount where email like '" +req.cookies.email + "';";
 					
 					// Execute SQL
 				  	connection.executequery(getUserDataSQL, function(err, data){
@@ -39,6 +39,10 @@ module.exports = function(){
 					  				res.status(401).json({"error": "Incorrect Password"});
 					  			}
 					  			else{
+					  				req.session.email = req.cookies.email;
+					  				req.session.password = password_hash;
+					  				req.session.uaid = data[0].uaid;
+					  				req.session.isAuthenticated = 1;
 					  				next();
 					  			}
 					  		}
