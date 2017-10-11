@@ -5,7 +5,7 @@ const crypto = require('crypto');
 
 module.exports = function(){
 	return function(req, res, next){
-		if(req.url.toLowerCase() == '/users/signin' || req.url.toLowerCase() == '/users/singup'){
+		if(req.url.toLowerCase() == '/users/signin' || req.url.toLowerCase() == '/users/signup'){
 			next();
 		}else{
 			if(req.session && req.session.isAuthenticated){
