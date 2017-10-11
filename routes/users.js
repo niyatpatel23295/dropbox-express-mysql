@@ -5,7 +5,7 @@ const crypto = require('crypto');
 
 
 /* API for signup users with email and password*/
-router.post('/signUp', function(req, res, next) {
+router.post('/signup', function(req, res, next) {
 	var salt = '';
 	crypto.randomBytes(256, function(err, buffer){
 		if(err) res.status(500).json({"error": "Can not create salt"});
@@ -38,7 +38,7 @@ router.post('/signUp', function(req, res, next) {
 });
 
 // API for SignIn users
-router.post('/signIn', function(req, res, next) {
+router.post('/signin', function(req, res, next) {
 
 	var getUserDataSQL = "SELECT email, password, salt FROM dropbox.useraccount where email like '" +req.body.email + "';";
 
@@ -66,6 +66,52 @@ router.post('/signIn', function(req, res, next) {
 	  				res.status(401).json({"error": "Incorrect Password"});
 	  			}
 	  			else{
+	  				req.session.email = req.body.email;
+	  				req.session.password = password_hash;
+	  				req.session.isAuthenticated = 1;
+	  				res.cookie('email', req.body.email, { expires: new Date(Date.now() + 900000), httpOnly: true });
+	  				res.cookie('password', password_hash, { expires: new Date(Date.now() + 900000), httpOnly: true });
+	  				res.status(200).json({"message": "success"});
+	  			}
+	  		}
+  		}
+  	});
+});
+
+// API for SignOut users
+router.post('/signout', function(req, res, next) {
+
+	var getUserDataSQL = "SELECT email, password, salt FROM dropbox.useraccount where email like '" +req.body.email + "';";
+
+	// Execute SQL
+  	connection.executequery(getUserDataSQL, function(err, data){
+  		if(err){
+  			console.trace(err);
+  			res.status(500).json({"error": "Internal server error"});
+  		}
+  		else {
+  			if( !(data.length > 0) ){
+  				res.status(404).json({"error": "User not found"});
+  			}	
+	  		else{
+	  			var password_hash = data[0].password;
+	  			var salt = data[0].salt;
+
+	  			// compute password hash of given password
+	  			var _hash = crypto.createHmac('sha512', salt);
+	  			_hash.update(req.body.password);
+	  			var _password_hash = _hash.digest('hex');
+
+	  			// Check input password with stored password
+	  			if(_password_hash !== password_hash){
+	  				res.status(401).json({"error": "Incorrect Password"});
+	  			}
+	  			else{
+	  				req.session.email = req.body.email;
+	  				req.session.password = password_hash;
+	  				req.session.isAuthenticated = 1;
+	  				res.cookie('email', req.body.email, { expires: new Date(Date.now() + 900000), httpOnly: true });
+	  				res.cookie('password', password_hash, { expires: new Date(Date.now() + 900000), httpOnly: true });
 	  				res.status(200).json({"message": "success"});
 	  			}
 	  		}

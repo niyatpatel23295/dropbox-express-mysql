@@ -8,9 +8,12 @@ var bodyParser = require('body-parser');
 var index 	= require('./routes/index');
 var users 	= require('./routes/users');
 var files 	= require('./routes/userfiles');
-
-var app = express();
-
+var auth 	= require('./middleware/auth');
+var app 	= express();
+var session = require('express-session');
+app.use(session({secret: 'cmpe273'}));
+app.use(cookieParser());
+app.use(auth());
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
