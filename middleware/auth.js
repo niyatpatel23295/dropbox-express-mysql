@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 var connection = require('./../utils/connection_helper.js');
 const crypto = require('crypto');
-
+var fs = require('fs-extra');
 module.exports = function(){
 	return function(req, res, next){
 		if(req.url.toLowerCase() == '/users/signin' || req.url.toLowerCase() == '/users/signup'){

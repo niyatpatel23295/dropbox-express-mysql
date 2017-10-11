@@ -5,6 +5,7 @@ var multer = require('multer');
 var storage = multer.memoryStorage();
 var upload = multer({ storage: storage });
 var fs = require('fs-extra');
+var fs_native = require('fs');
 var connection = require('./../utils/connection_helper.js');
 
 /* Upload file */
@@ -67,6 +68,45 @@ router.get('/:uaid/*', function(req, res, next) {
 	}
 });
 
+/* Upload file */
+router.post('/getfileslist', upload.single('file'),  function(req, res, next) {
+	// Check is user is authentic
+	var getUserDataSQL = "SELECT uaid FROM useraccount WHERE email = '" +req.session.email + "'";
+	connection.executequery(getUserDataSQL, function(err, data){
+		if(err){
+			console.trace(err);
+			res.status(500).json({"error": "Internal Server Error"});
+		}
+		else{
+			if( !(data.length>0) ){
+				res.status(404).json({"error": "User not found"});
+			}
+			else{
+				console.log(req.body.path);
+				var path = req.body.path == '' ? '' 		: 		req.body.path.startsWith('/') ? req.body.path.endsWith('/') ? req.body.path : req.body.path + '/'	: 	req.body.path.endsWith('/') ? '/' + req.body.path : '/' + req.body.path + '/';
+				
+				var filesList = fs.readdirSync('./files/' + data[0].uaid +  path );
+				
+				var files = [];
+				var folders = [];
+				var result = {};
+
+				filesList.forEach(function(item, index){
+					if(fs_native.statSync('./files/' + data[0].uaid +  path + '/' + item).isFile()){
+						files.push(item);
+					}
+					else{
+						folders.push(item);
+					}
+				});
+				result.files = files;
+				result.folders = folders;
+				console.log(result);
+				res.status(200).json(result);
+			}
+		}
+	});
+});
 
 
 module.exports = router;
