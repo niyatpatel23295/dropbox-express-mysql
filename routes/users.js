@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 var connection = require('./../utils/connection_helper.js');
 const crypto = require('crypto');
-
+var fs = require('fs-extra');
 
 /* API for signup users with email and password*/
 router.post('/signup', function(req, res, next) {
@@ -30,14 +30,15 @@ router.post('/signup', function(req, res, next) {
 		  			res.status(500).json({"error": "Can not create user"});
 		  		}
 		  		else{
+		  			fs.mkdirsSync('./files/' + result.insertId);
 		  			console.log(result);
 	  				req.session.email = req.body.email;
 	  				req.session.password = password_hash;
 	  				req.session.isAuthenticated = 1;
 	  				req.session.uaid = result.insertId;
-	  				res.cookie('email', req.body.email, { expires: new Date(Date.now() + 900000), httpOnly: true });
-	  				res.cookie('password', password_hash, { expires: new Date(Date.now() + 900000), httpOnly: true });
-	  				res.cookie('uaid', result.insertId, { expires: new Date(Date.now() + 900000), httpOnly: true });
+	  				res.cookie('email', req.body.email, { secure: false, expires: new Date(Date.now() + 900000), httpOnly: true });
+	  				res.cookie('password', password_hash, { secure: false, expires: new Date(Date.now() + 900000), httpOnly: true });
+	  				res.cookie('uaid', result.insertId, { secure: false, expires: new Date(Date.now() + 900000), httpOnly: true });
 		  			res.status(200).json({"message": "success"});
 		  		}
 		  	});
@@ -74,13 +75,16 @@ router.post('/signin', function(req, res, next) {
 	  				res.status(401).json({"error": "Incorrect Password"});
 	  			}
 	  			else{
+	  				console.log('request received!');
+
 	  				req.session.email = req.body.email;
 	  				req.session.password = password_hash;
 	  				req.session.isAuthenticated = 1;
 	  				req.session.uaid = data[0].uaid;
-	  				res.cookie('email', req.body.email, { expires: new Date(Date.now() + 900000), httpOnly: true });
-	  				res.cookie('password', password_hash, { expires: new Date(Date.now() + 900000), httpOnly: true });
-	  				res.cookie('uaid', data[0].uaid, { expires: new Date(Date.now() + 900000), httpOnly: true });
+	  				res.cookie('email', req.body.email, { secure: false, expires: new Date(Date.now() + 900000), httpOnly: true });
+	  				res.cookie('password', password_hash, { secure: false, expires: new Date(Date.now() + 900000), httpOnly: true });
+	  				res.cookie('uaid', data[0].uaid, { secure: false, expires: new Date(Date.now() + 900000), httpOnly: true });
+	  				console.log("here"+req.body.email);
 	  				res.status(200).json({"message": "success"});
 	  			}
 	  		}

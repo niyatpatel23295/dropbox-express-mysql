@@ -4,13 +4,14 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-
+var cors = require('cors');
 var index 	= require('./routes/index');
 var users 	= require('./routes/users');
 var files 	= require('./routes/userfiles');
 var auth 	= require('./middleware/auth');
 var app 	= express();
 var session = require('express-session');
+app.use(cors());
 app.use(session({secret: 'cmpe273'}));
 app.use(cookieParser());
 app.use(auth());
@@ -31,6 +32,12 @@ app.use('/users', users);
 
 app.use('/files', files);
 
+
+app.use(function(req, res, next) {
+	console.log("CORS disabled");
+  res.header("Access-Control-Allow-Origin", "*");
+  next();
+});
 
 
 // catch 404 and forward to error handler
